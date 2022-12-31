@@ -1,0 +1,6 @@
+tensorflow-gpu==2.3.0
+tensorflow-addons
+matplotlib
+scipy
+scikit-learn
+networkx
