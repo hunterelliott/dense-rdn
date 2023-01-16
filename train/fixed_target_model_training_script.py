@@ -1,9 +1,12 @@
 """
-Script for configuring and then training "z-propagation" style models.
+Script for configuring and then training pattern formation models which target a specific fixed steady state.
 """
 import os
 import math
+import uuid
+
 import numpy as np
+import random
 import logging
 
 os.environ["CUDA_VISIBLE_DEVICES"] = '1'
@@ -27,9 +30,6 @@ from ops import image_similarity_loss, image_correlation_loss, bounded_batch_cor
 # ---- Config ---- #
 
 
-##=========================================================================================================
-## ==========!!!!! YOU NEED TO CHANGE THE X_OUTPUT of PROPAGATION_MODEL BACK BEFORE USING THIS SCRIPT AGAIN!!!=====##
-##=========================================================================================================
 
 x_shape = (256, 256, 5)
 z_shape = (1, 1, 256)
@@ -83,7 +83,7 @@ build_kwargs = {'state_transition_model': None,  # We fill this in later to allo
                 'x_pad_encoder': 0,
                 'freeze_generator': False,
                 'freeze_encoder': False,
-                'x_outputs': x_loss_weight != 0 or has_therm_loss,
+                'x_outputs': (1, 2) if (x_loss_weight != 0 or has_therm_loss) else None,
                 'z_outputs': z_recon_loss_weight != 0,
                 }
 
@@ -96,7 +96,7 @@ if entropy_var_loss_weight != 0:
                                                             weight=entropy_var_loss_weight)
     iteration_kwargs['meta_loss_func'] = var_loss_func
 
-target_image = './assets/Ilya_Prigogine_1977c_compressed.jpg'
+target_image = '../assets/Ilya_Prigogine_1977c_compressed.jpg'
 chan_map = [[0, 1]]
 
 
@@ -144,10 +144,7 @@ train_kwargs = {'batch_size': 2,
                 'compile_kwargs': compile_kwargs}
 
 
-out_dir = '/media/hunter/fast storage/Training_Experiments/Iteration_C1/Dense_CRNs/v1_Fixed_Ilya/test_208'
-# import random
-# out_dir = '/Users/hunterelliott/TEMP/test_gs_crn_init/test_' + str(random.randint(1000, 9999))
-# out_dir = '/home/hunter/Desktop/TEMP/test_combinedcorrloss/test_' + str(random.randint(1000, 9999))
+out_dir = os.path.expanduser('~/TEMP/fixed_target_training/test_' + str(uuid.uuid4()))
 
 utils.posterity_log(out_dir, locals(), __file__)
 

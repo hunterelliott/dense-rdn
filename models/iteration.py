@@ -18,7 +18,7 @@ def propagation_model(x_shape, z_shape, n_t,
                       x_output_period=None, iteration_layer='IterationLayer',
                       state_generator=None, state_transition_model=None, state_encoder=None,
                       x_pad_generator=None, x_pad_encoder=None, batch_size=None, name='propagation_model',
-                      freeze_encoder=False, freeze_generator=False, x_outputs=True, padded_x_out=True,
+                      freeze_encoder=False, freeze_generator=False, x_outputs=(0, -1), padded_x_out=True,
                       z_outputs=True):
     """
     A model which generates X_0 from Z and then propagates it through time, possibly reconstructing Z as well.
@@ -34,8 +34,9 @@ def propagation_model(x_shape, z_shape, n_t,
         state_encoder: Optionally input a state generator model which encodes Z_t from X_t. Name, filename or Model Object.
         x_pad_... : Optionally pad the input / output of the encoder / decoder to allow X to be larger than these models.
         name: (optional) model name for the created z propagation model.
-        x_outputs: If true, include outputs of the X-(sub)domain for use in similarity losses. If the x_pad_generator is
-            not None then this output will be cropped to match the generator's sub-domain.
+        x_outputs: If not None, include these indices of iteration layer outputs of the X-(sub)domain for use in
+            similarity losses. If the x_pad_generator is not None then this output will be cropped to match the
+            generator's sub-domain.
         padded_x_out If True and x_pad_generator not None then the model outputs will be padded (both at t=0 and t=n_t)
         z_outputs: If true, include outputs of the Z-encoding of X-(sub) domain for use in Z-reconstruction losses.
 
@@ -89,11 +90,11 @@ def propagation_model(x_shape, z_shape, n_t,
 
     if x_outputs:
         if x_pad_generator is not None and not padded_x_out:
-            x_0_hat = Cropping2D(x_pad_generator)(x_0)
-            x_t_hat = Cropping2D(x_pad_generator)(x_vs_t[-1])
+            x_0_hat = Cropping2D(x_pad_generator)(x_vs_t[x_outputs[0]])
+            x_t_hat = Cropping2D(x_pad_generator)(x_vs_t[x_outputs[1]])
         else:
-            x_0_hat = x_vs_t[0]
-            x_t_hat = x_vs_t[-1]
+            x_0_hat = x_vs_t[x_outputs[0]]
+            x_t_hat = x_vs_t[x_outputs[1]]
         # Do this hacky shit to follow keras loss/output specs
         x_stack_t = Concatenate(axis=-1, name='x_output')([tf.expand_dims(x_0_hat, axis=-1),
                                                            tf.expand_dims(x_t_hat, axis=-1)])

@@ -1,9 +1,11 @@
 """
-Script for configuring and then training "z-propagation" style models.
+Script for configuring and then training e.g. dissipation maximization or information propagation models.
 """
 import os
 import math
 import numpy as np
+import random
+import uuid
 import logging
 
 os.environ["CUDA_VISIBLE_DEVICES"] = '0'
@@ -75,7 +77,7 @@ build_kwargs = {'state_transition_model': None,  # We fill this in later to allo
                 'x_pad_encoder': 0,
                 'freeze_generator': False,
                 'freeze_encoder': False,
-                'x_outputs': x_loss_weight != 0 or has_therm_loss,
+                'x_outputs': (0, -1) if (x_loss_weight != 0 or has_therm_loss) else None,
                 'z_outputs': z_recon_loss_weight != 0,
                 }
 
@@ -107,10 +109,7 @@ train_kwargs = {'batch_size': 2,
                 'compile_kwargs': compile_kwargs}
 
 
-out_dir = '/media/hunter/fast storage/Training_Experiments/Iteration_C1/Dense_CRNs/v3_DissInf/test_57'
-# import random
-# out_dir = '/Users/hunterelliott/TEMP/test_gs_crn_init/test_' + str(random.randint(1000, 9999))
-# out_dir = '/home/hunter/Desktop/TEMP/test_dissinf_noise/test_' + str(random.randint(1000, 9999))
+out_dir = os.path.expanduser('~/TEMP/propagation_model_training/test_' + str(uuid.uuid4()))
 
 utils.posterity_log(out_dir, locals(), __file__)
 
