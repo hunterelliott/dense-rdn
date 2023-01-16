@@ -5,7 +5,7 @@ Dense reaction-diffusion network optimization code, accompanying the manuscript:
 
 This has been tested with python 3.8.5 and tensorflow up to 2.5.0 (w/ and w/out GPU acceleration).
 
-###Setup:
+### Setup:
 
 1. Clone the repo, where `{DENSE_RDN_PATH}` is a path to wherever you want to clone it e.g. `~/code/dense-rdn`
 
@@ -25,7 +25,7 @@ This has been tested with python 3.8.5 and tensorflow up to 2.5.0 (w/ and w/out 
 
 `export PYTHONPATH=$PYTHONPATH:{DENSE_RDN_PATH}`
 
-`cd {DENSE_RDN_PATH}\train\`
+`cd {DENSE_RDN_PATH}/train/`
 
 `python fixed_target_model_training_script.py`
 
